@@ -1,5 +1,5 @@
 """
-    Pi FirePager - Software fire pager for German ZVEI alarm codes
+    OpenFirePager - Software fire pager for German ZVEI alarm codes
 
     Copyright (C) 2013 Manuel Peuster <manuel@peuster.de>
 
