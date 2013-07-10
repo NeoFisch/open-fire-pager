@@ -16,3 +16,48 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+
+"""
+Simple dummy script to generate random output which looks like the
+output of the 'multimon' tool.
+This is used to do off-line tests without de-coding real ZVEI radio codes.
+"""
+
+import time
+import random
+
+
+sleeptime = 0.3
+alert_probability = 0.2
+
+
+def generate_alert():
+    r = random.randint(0, 99)
+    if r < alert_probability * 100:
+        return True
+    return False
+
+
+def create_random_alert():
+    zvei_code = []
+    for i in range(5):
+        zvei_code.append(random.randint(0, 9))
+        if i > 0 and zvei_code[i] == zvei_code[i - 1]:
+            zvei_code[i] = 'e'
+    return zvei_code
+
+
+def run():
+    while True:
+        if generate_alert():
+            zvei_code = create_random_alert()
+            for e in zvei_code:
+                print "ZVEI: %s" % e
+                time.sleep(sleeptime)
+        else:
+            print "ZVEI: f"
+        time.sleep(sleeptime)
+
+
+if __name__ == '__main__':
+    run()
