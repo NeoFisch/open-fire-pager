@@ -7,5 +7,7 @@ Especially designed for the RaspberryPi platform, because of its low energy cons
 
 ### References
 Multimon - Linux Radio Transmission Decoder: http://www.baycom.org/~tom/ham/linux/multimon.html
+
 RaspberryPi: http://www.raspberrypi.org
+
 ZVEI coding: http://de.wikipedia.org/wiki/5-Ton-Folge / http://en.wikipedia.org/wiki/Selcall
