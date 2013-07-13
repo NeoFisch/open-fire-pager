@@ -25,9 +25,10 @@ This is used to do off-line tests without de-coding real ZVEI radio codes.
 
 import time
 import random
+import sys
 
 
-sleeptime = 0.3
+sleeptime = 0.1
 alert_probability = 0.2
 
 
@@ -43,19 +44,39 @@ def create_random_alert():
     for i in range(5):
         zvei_code.append(random.randint(0, 9))
         if i > 0 and zvei_code[i] == zvei_code[i - 1]:
-            zvei_code[i] = 'e'
+            if flip_coin():
+                zvei_code[i] = 'e'
+            else:
+                zvei_code[i] = 'E'
     return zvei_code
+
+
+def flip_coin():
+    if random.randint(0, 99) % 2 == 0:
+        return True
+    return False
 
 
 def run():
     while True:
         if generate_alert():
             zvei_code = create_random_alert()
-            for e in zvei_code:
-                print "ZVEI: %s" % e
-                time.sleep(sleeptime)
+            if flip_coin():  # print only one symbol
+                for e in zvei_code:
+                    print "ZVEI: %s" % e
+                    time.sleep(sleeptime)
+            else:  # print all 5 at once
+                out = ""
+                for e in zvei_code:
+                    out += str(e)
+                print "ZVEI: %s" % out
+
         else:
-            print "ZVEI: f"
+            if flip_coin():
+                print "ZVEI: f"
+            else:
+                print "ZVEI: F"
+        sys.stdout.flush()
         time.sleep(sleeptime)
 
 

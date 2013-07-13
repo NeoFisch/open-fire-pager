@@ -24,6 +24,7 @@ import atexit
 import logging
 import argparse
 from signal import SIGTERM
+from pager.pager import Pager
 
 
 class DaemonBase(object):
@@ -191,7 +192,7 @@ class PagerDaemon(DaemonBase):  # inherits from DaemonBase to build a Unix daemo
         # setup logging
         logging.basicConfig(filename=logfile, filemode="w", level=loglevel,
                             format="%(asctime)s [%(levelname)-8s] %(message)s")
-        logging.debug("OpenFirePage logging enabled with loglevel: DEBUG")
+        logging.debug("OpenFirePager logging enabled with loglevel: DEBUG")
 
     def start(self, params, daemonize=True):
         '''
@@ -205,9 +206,8 @@ class PagerDaemon(DaemonBase):  # inherits from DaemonBase to build a Unix daemo
         Sets up the pager and go into infinity serving loop.
         '''
         logging.info('OpenFirePager daemon running with PID: %s' % str(self.pid))
-        # run daemon loop
-        while True:
-            time.sleep(10)
+        p = Pager(params)
+        p.run()
 
 
 def parse_arguments():
