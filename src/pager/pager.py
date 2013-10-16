@@ -19,7 +19,8 @@
 
 import logging
 import time
-import multimon
+import monitord
+import urllib2
 
 
 class Pager(object):
@@ -32,14 +33,17 @@ class Pager(object):
         self.setup()
         while True:
             self.wakeup()
-            time.sleep(60 * 60)
+            time.sleep(600)  # send alive after 10 minutes  
 
     def setup(self):
-        mm_zvei = multimon.MultimonZveiDriver(self.params)
-        mm_zvei.start_monitoring()
+        #mm_zvei = multimon.MultimonZveiDriver(self.params)
+        #mm_zvei.start_monitoring()
+        monitor = monitord.MonitordTcpDriver(self.params)
+        monitor.start_monitoring()
 
     def wakeup(self):
-        logging.info("Wakeup...")
-
-
-
+        logging.info("Wakeup... sending alive message.")
+        try:
+            urllib2.urlopen("http://alarmierung.feuerwehr-nieder-werbe.de/alert/raise/action/alive/token/fX1sLo98fFjBghj")
+        except:
+            logging.exception("Exception in URL alive request.")
