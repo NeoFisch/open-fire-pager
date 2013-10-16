@@ -44,6 +44,6 @@ class Pager(object):
     def wakeup(self):
         logging.info("Wakeup... sending alive message.")
         try:
-            urllib2.urlopen("http://alarmierung.feuerwehr-nieder-werbe.de/alert/raise/action/alive/token/fX1sLo98fFjBghj")
+            urllib2.urlopen("http://alive_url.com/alive")
         except:
             logging.exception("Exception in URL alive request.")
