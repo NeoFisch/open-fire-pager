@@ -96,7 +96,7 @@ class MonitoringThread(threading.Thread):
             res = None
             while data != '1' and tries < 5:
                 try:
-                    res = urllib2.urlopen("http://alarmierung.feuerwehr-nieder-werbe.de/alert/raise/action/alert/token/fX1sLo98fFjBghj")
+                    res = urllib2.urlopen("http://alarm-url.com/alarm")
                 except:
                     logging.exception("Exception in URL alarm request.")
                 if res is not None:
