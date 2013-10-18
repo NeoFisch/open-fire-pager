@@ -33,3 +33,11 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Others
+*.swp
+
+# Project specific
+src/fire_dispatcher/fd_database.db
+src/fire_dispatcher/fire_dispatcher/key.py
+

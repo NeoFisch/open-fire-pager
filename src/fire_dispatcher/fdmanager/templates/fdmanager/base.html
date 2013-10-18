@@ -1,0 +1,41 @@
+{% load bootstrap3 %}
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>OpenFirePager - Manager</title>
+		{% bootstrap_css %}
+		<link rel="stylesheet" type="text/css" href="{% static "fdmanager/css/style.css" %}" />
+		<script src="//code.jquery.com/jquery.js"></script>
+		{% bootstrap_javascript %}	
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">	
+	</head>
+	<body>
+		<div class="container center">
+			<!-- TITLE -->
+			<div class="title" class="page-header">
+				{% block title %}{% include "fdmanager/title.html" %}{% endblock %}
+			</div>
+			<!-- MENU -->
+			<div class="menu">
+				{% block menu %}{% include "fdmanager/menu.html" %}{% endblock %}
+			</div>
+			<!-- CONTENT -->
+			<div class="content">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">{% block content_title %}Content-Panel Title{% endblock %}</h3>
+					</div>
+					<div class="panel-body">
+						{% block content %}Content{% endblock %}
+					</div>
+				</div>
+	    	</div>
+	    	<!-- FOOTER -->
+	    	<div class="footer">
+	    		{% block footer %}{% include "fdmanager/footer.html" %}{% endblock %}
+	    	</div>
+    	</div>
+	</body>
+</html>
