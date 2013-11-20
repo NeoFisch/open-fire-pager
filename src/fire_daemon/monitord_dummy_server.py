@@ -72,7 +72,7 @@ def fetch_random_message(wait_intervall=(0.01, 0.4), test_zvei=51372, test_zvei_
     return (wait_time, message)
 
 
-def run_typ_server():
+def run_typ_server(close_after_n_messages=30):
     """
     Runs a very simple TCP server, sending random alarm messages.
     Stop it with: CTRL+C in your terminal.
@@ -87,11 +87,17 @@ def run_typ_server():
         s.listen(1)
         c, addr = s.accept()
         print "Client connected: %s" % str(addr)
+        message_counter = 0
         while 1:
             try:
                 wait, message = fetch_random_message()
-                print "Sending message: %s" % message
+                print "Sending message (%d/%d): %s" % (message_counter, close_after_n_messages, message)
                 c.send(message)
+                message_counter += 1
+                if close_after_n_messages is not None and message_counter > close_after_n_messages:
+                    print "Closing connection to simulate error"
+                    c.close()
+                    break
                 print "Waiting for %f seconds" % wait
                 time.sleep(wait)
             except Exception as e:
