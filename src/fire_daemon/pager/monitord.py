@@ -19,20 +19,18 @@
 
 import logging
 import threading
-import socket
+import subprocess
 import time
-import urllib2
-import time
+import os
 
 
-class MonitordTcpDriver(object):
+class MonitordDriver(object):
 
     def __init__(self, params):
         self.params = params
         self.monitor_thread = MonitoringThread()
         self.monitor_thread.setDaemon(True)
-
-        logging.info("Monitord TCP driver initialized.")
+        logging.info("Monitord driver initialized.")
 
     def start_monitoring(self):
         self.monitor_thread.start()
@@ -43,63 +41,43 @@ class MonitoringThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.last_alarm = 0
+        self.command = ["/home/manuel/monitor/trunk/monitord/monitord"]
+        self.cwd = "/home/manuel/monitor/trunk/monitord/"
 
-    def connect(self):
-        connected = False
-        while not connected:
-            try:
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect(("127.0.0.1", 9333))
-                #s.settimeout(2)
-                connected = True
-                logging.info("Connected to: 127.0.0.1:9333")
-            except:
-                logging.info("Connection refused. Retry ...")
-                time.sleep(0.5)
-        return s
 
     def run(self):
         logging.info("Monitoring started ...")
-        s = self.connect()
-
+        process = subprocess.Popen(self.command, cwd=self.cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        # analyze outputs of monitord
         while True:
-            try:
-                data = s.recv(4096)
-            except socket.timeout, e:
-                err = e.args[0]
-                # if timeout occurs: sleep a second
-                if err == 'timed out':
-                    print "Socket timeout"
-                    time.sleep(1)
-                    continue
-            except socket.error, e:
-                logging.exception("TCP exception:")
-            else:
-                if len(data):
-                    logging.debug("Message received from monitord: %s" % data)
-                    message_parts = data.split(":")
-                    for p in message_parts:
-                        if p == "51372":  # Pager id FF Nieder- Werbe
-                            self.alert()
-                else:
-                    try:
-                        s.close()
-                    except:
-                        logging.exception("TCP Close exception:")
-                    s = self.connect()
+            zvei = self.parse_zvei_code(process.stdout.readline())
+            if zvei is not None:
+                logging.info("Received ZVEI Code: %s" % zvei)
+                self.execute_alarm_scripts(zvei)
 
-    def alert(self):
-        if (time.time() - self.last_alarm) > 300:  # 5 minute cool down
-            self.last_alarm = time.time()
-            data = '0'
-            tries = 0
-            res = None
-            while data != '1' and tries < 5:
-                try:
-                    res = urllib2.urlopen("http://alarm-url.com/alarm")
-                except:
-                    logging.exception("Exception in URL alarm request.")
-                if res is not None:
-                    data = res.read()
-                tries += 1
-            logging.info(" *** ALARM for ZVEI: 51372 ***")
+    def parse_zvei_code(self, data):
+        try:
+            if data is not None:
+                if "zvei = " in data:
+                    zvei = data.split()[2].replace('"', '')
+                    if len(zvei) != 5:
+                        logging.warning("Bad ZVEI code: %s" % zvei)
+                        return None
+                    return int(zvei)
+        except:
+            return logging.warning("Parsing exception.")
+        return None
+
+    def execute_alarm_scripts(self, zvei):
+        alarm_script_dir = "plugins/alarm"
+        script_list = [f for f in os.listdir(alarm_script_dir) if os.path.isfile(os.path.join(alarm_script_dir,f)) ]
+        script_list.sort()
+        for f in script_list:
+            try:
+                print f
+                subprocess.Popen(["./%s" % str(f), str(zvei)])
+            except:
+                logging.exception("Script execution error.")
+
+
+

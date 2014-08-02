@@ -24,7 +24,7 @@ import atexit
 import logging
 import argparse
 from signal import SIGTERM
-from pager.pager import Pager
+from pager import Pager
 
 
 class DaemonBase(object):
