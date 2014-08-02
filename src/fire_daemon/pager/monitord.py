@@ -40,19 +40,27 @@ class MonitoringThread(threading.Thread):
 
     def __init__(self):
         threading.Thread.__init__(self)
-        self.last_alarm = 0
         self.command = ["/home/manuel/monitor/trunk/monitord/monitord"]
         self.cwd = "/home/manuel/monitor/trunk/monitord/"
+        self.alarm_script_dir = "plugins/alarm"
+        # dict to store the last alarm of a ZVEI code:
+        self.last_alarms = {}
+        # time between two alarm runs of one ZVEI code
+        self.cooldown = 60
 
 
     def run(self):
         logging.info("Monitoring started ...")
         process = subprocess.Popen(self.command, cwd=self.cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        # analyze outputs of monitord
+        # analyze outputs of monitord, and execute alarm scripts:
         while True:
             zvei = self.parse_zvei_code(process.stdout.readline())
             if zvei is not None:
                 logging.info("Received ZVEI Code: %s" % zvei)
+                if zvei in self.last_alarms:
+                    if abs(time.time() - self.last_alarms[zvei]) < self.cooldown:
+                        continue # skip execution (cooldown)
+                self.last_alarms[zvei] = time.time()
                 self.execute_alarm_scripts(zvei)
 
     def parse_zvei_code(self, data):
@@ -69,15 +77,13 @@ class MonitoringThread(threading.Thread):
         return None
 
     def execute_alarm_scripts(self, zvei):
-        alarm_script_dir = "plugins/alarm"
-        script_list = [f for f in os.listdir(alarm_script_dir) if os.path.isfile(os.path.join(alarm_script_dir,f)) ]
+        script_list = [os.path.join(self.alarm_script_dir, f) for f in os.listdir(self.alarm_script_dir) if os.path.isfile(os.path.join(self.alarm_script_dir,f)) ]
         script_list.sort()
         for f in script_list:
             try:
-                print f
-                subprocess.Popen(["./%s" % str(f), str(zvei)])
+                subprocess.Popen([f, str(zvei)])
             except:
-                logging.exception("Script execution error.")
+                logging.error("Script execution error: %s" % str(f))
 
 
 
