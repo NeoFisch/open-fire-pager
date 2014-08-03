@@ -28,7 +28,7 @@ class Pager(object):
     def __init__(self, params):
         self.params = params
         self.wakeupinterval = 600
-        self.wakeup_script_dir = "plugins/wakeup"
+        self.wakeup_script_dir = "/home/manuel/open-fire-pager/src/fire_daemon/plugins/wakeup/"
 
     def run(self):
         self.setup()

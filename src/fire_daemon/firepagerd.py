@@ -23,7 +23,7 @@ import time
 import atexit
 import logging
 import argparse
-from signal import SIGTERM
+import signal
 from pager import Pager
 
 
@@ -75,9 +75,9 @@ class DaemonBase(object):
         os.dup2(si.fileno(), sys.stdin.fileno())
         os.dup2(so.fileno(), sys.stdout.fileno())
         os.dup2(se.fileno(), sys.stderr.fileno())
-        # create pidfile
         atexit.register(self.delpid)
         atexit.register(self.shutdownlogger)
+        # create pidfile
         pid = str(os.getpid())
         self.pid = pid
         file(self.pidfile, 'w+').write("%s\n" % pid)
@@ -113,12 +113,14 @@ class DaemonBase(object):
             self.fork_process()
         self.run(params)
 
-    def stop(self):
+    def stop(self, pidfile=None):
         """
         Stop the daemon
         """
+        if pidfile is None:
+            pidfile = self.pidfile
         try:
-            pf = file(self.pidfile, 'r')
+            pf = file(pidfile, 'r')
             pid = int(pf.read().strip())
             pf.close()
         except IOError:
@@ -130,7 +132,7 @@ class DaemonBase(object):
         print "Stopping daemon..."
         try:
             while 1:
-                os.kill(pid, SIGTERM)
+                os.kill(pid, signal.SIGTERM)
                 time.sleep(0.1)
         except OSError, err:
             err = str(err)
@@ -211,8 +213,8 @@ class PagerDaemon(DaemonBase):
         '''
         logging.info("OpenFirePager daemon running with PID: %s"
                      % str(self.pid))
-        p = Pager(params)
-        p.run()
+        self.pager = Pager(params)
+        self.pager.run()
 
 
 def parse_arguments():

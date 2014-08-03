@@ -43,7 +43,7 @@ class MonitoringThread(threading.Thread):
         threading.Thread.__init__(self)
         self.command = ["/home/manuel/monitor/trunk/monitord/monitord"]
         self.cwd = "/home/manuel/monitor/trunk/monitord/"
-        self.alarm_script_dir = "plugins/alarm"
+        self.alarm_script_dir = "/home/manuel/open-fire-pager/src/fire_daemon/plugins/alarm/"
         self.zvei_filter = "51"
         # dict to store the last alarm of a ZVEI code:
         self.last_alarms = {}
@@ -59,22 +59,27 @@ class MonitoringThread(threading.Thread):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT
                 )
-            logging.info("Monitord process started ...")
+            logging.info("Monitord process started.")
         except:
             logging.exception("Could not start monitord process. Exit.")
             exit(1)
 
         # infinite loop to monitor ZVEI decoding
         while True:
-            zvei = self.parse_zvei_code(process.stdout.readline())
-            if zvei is not None:
-                logging.info("Received ZVEI Code: %s" % zvei)
-                if zvei in self.last_alarms:
-                    if abs(time.time()
-                            - self.last_alarms[zvei]) < self.cooldown:
-                        continue  # skip execution (cooldown)
-                self.last_alarms[zvei] = time.time()
-                self.execute_alarm_scripts(zvei)
+            try:
+                data = process.stdout.readline()
+                # logging.debug("Monitord output: %s" % str(data))
+                zvei = self.parse_zvei_code(data)
+                if zvei is not None:
+                    logging.info("Received ZVEI Code: %s" % zvei)
+                    if zvei in self.last_alarms:
+                        if abs(time.time()
+                                - self.last_alarms[zvei]) < self.cooldown:
+                            continue  # skip execution (cooldown)
+                    self.last_alarms[zvei] = time.time()
+                    self.execute_alarm_scripts(zvei)
+            except:
+                logging.exception("Error in ZVEI decoding loop.")
 
     def parse_zvei_code(self, data):
         try:
