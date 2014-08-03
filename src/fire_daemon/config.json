@@ -9,7 +9,7 @@
 	},
 	"options": {
 		"wakeupinterval": 600,
-		"alarm_cooldown": 60,
+		"alarm_cooldown": 180,
 		"zvei_filter": "51"
 	}
 
