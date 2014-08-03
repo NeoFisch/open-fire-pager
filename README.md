@@ -1,12 +1,15 @@
 OpenFirePager
 =============
 
-Software fire pager for Linux. Uses "multimon" to decode German ZVEI radio alarm codes. Used to trigger additional SMS alarm for our local volunteer fire station. 
+Software fire pager for Linux. Uses "monitord" to decode German ZVEI radio alarm codes. Used to trigger additional SMS alarm for our local volunteer fire station. 
 
-Especially designed for the RaspberryPi platform, because of its low energy consumption. Can also switch additional peripherals with the Raspberry's on-board GPIO pins.
+* Can run on Raspberry Pi for low power consumption.
+* Easy to extend by plugin scripts.
+* Needs a radio scanner + sound card to monitor radio channel.
 
 ### References
-Multimon - Linux Radio Transmission Decoder: http://www.baycom.org/~tom/ham/linux/multimon.html
+
+Monitord - http://www.monitord.de/
 
 RaspberryPi: http://www.raspberrypi.org
 
