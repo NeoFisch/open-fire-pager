@@ -17,29 +17,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import os
 import logging
-import time
-import monitord
-import plugins
+import subprocess
 
 
-class Pager(object):
-
-    def __init__(self, params):
-        self.params = params
-        self.wakeupinterval = 600
-        self.wakeup_script_dir = "plugins/wakeup"
-
-    def run(self):
-        self.setup()
-        while True:
-            self.wakeup()
-            time.sleep(self.wakeupinterval)
-
-    def setup(self):
-        monitor = monitord.MonitordDriver(self.params)
-        monitor.start_monitoring()
-
-    def wakeup(self):
-        logging.info("Wakeup!")
-        plugins.execute_plugins(self.wakeup_script_dir)
+def execute_plugins(script_dir, arg=None):
+    """
+    Execute all scripts within the given folder.
+    Add arg as first command line argument.
+    """
+    script_list = [os.path.join(script_dir, f) for f
+                   in os.listdir(script_dir) if
+                   os.path.isfile(os.path.join(script_dir, f))]
+    script_list.sort()
+    for f in script_list:
+        try:
+            subprocess.Popen([f, str(arg) if arg is not None else ""])
+            logging.info("Executing: %s %s"
+                         % (f, str(arg) if arg is not None else ""))
+        except:
+            logging.exception("Script execution error: %s" % str(f))

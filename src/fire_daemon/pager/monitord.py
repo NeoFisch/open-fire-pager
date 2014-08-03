@@ -22,6 +22,7 @@ import threading
 import subprocess
 import time
 import os
+import plugins
 
 
 class MonitordDriver(object):
@@ -43,23 +44,35 @@ class MonitoringThread(threading.Thread):
         self.command = ["/home/manuel/monitor/trunk/monitord/monitord"]
         self.cwd = "/home/manuel/monitor/trunk/monitord/"
         self.alarm_script_dir = "plugins/alarm"
+        self.zvei_filter = "51"
         # dict to store the last alarm of a ZVEI code:
         self.last_alarms = {}
         # time between two alarm runs of one ZVEI code
         self.cooldown = 60
 
-
     def run(self):
-        logging.info("Monitoring started ...")
-        process = subprocess.Popen(self.command, cwd=self.cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        # analyze outputs of monitord, and execute alarm scripts:
+        # run monitord as a subprocess and parse outputs
+        try:
+            process = subprocess.Popen(
+                self.command,
+                cwd=self.cwd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT
+                )
+            logging.info("Monitord process started ...")
+        except:
+            logging.exception("Could not start monitord process. Exit.")
+            exit(1)
+
+        # infinite loop to monitor ZVEI decoding
         while True:
             zvei = self.parse_zvei_code(process.stdout.readline())
             if zvei is not None:
                 logging.info("Received ZVEI Code: %s" % zvei)
                 if zvei in self.last_alarms:
-                    if abs(time.time() - self.last_alarms[zvei]) < self.cooldown:
-                        continue # skip execution (cooldown)
+                    if abs(time.time()
+                            - self.last_alarms[zvei]) < self.cooldown:
+                        continue  # skip execution (cooldown)
                 self.last_alarms[zvei] = time.time()
                 self.execute_alarm_scripts(zvei)
 
@@ -71,19 +84,13 @@ class MonitoringThread(threading.Thread):
                     if len(zvei) != 5:
                         logging.warning("Bad ZVEI code: %s" % zvei)
                         return None
+                    if self.zvei_filter is not None:
+                        if not zvei.startswith(self.zvei_filter):
+                            return None
                     return int(zvei)
         except:
             return logging.warning("Parsing exception.")
         return None
 
     def execute_alarm_scripts(self, zvei):
-        script_list = [os.path.join(self.alarm_script_dir, f) for f in os.listdir(self.alarm_script_dir) if os.path.isfile(os.path.join(self.alarm_script_dir,f)) ]
-        script_list.sort()
-        for f in script_list:
-            try:
-                subprocess.Popen([f, str(zvei)])
-            except:
-                logging.error("Script execution error: %s" % str(f))
-
-
-
+        plugins.execute_plugins(self.alarm_script_dir, arg=zvei)

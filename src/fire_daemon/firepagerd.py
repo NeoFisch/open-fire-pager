@@ -32,7 +32,8 @@ class DaemonBase(object):
     Base class for creating an UNIX daemon process.
     '''
 
-    def __init__(self, pidfile, stdin=os.devnull, stdout=os.devnull, stderr=os.devnull):
+    def __init__(self, pidfile, stdin=os.devnull, stdout=os.devnull,
+                 stderr=os.devnull):
         '''
         Init input values
         '''
@@ -65,7 +66,7 @@ class DaemonBase(object):
         except OSError, e:
             sys.stderr.write("fork failed: %d (%s)\n" % (e.errno, e.strerror))
             sys.exit(1)
-        #redirect standard file descriptors
+        # redirect standard file descriptors
         sys.stdout.flush()
         sys.stderr.flush()
         si = file(self.stdin, 'r')
@@ -74,7 +75,7 @@ class DaemonBase(object):
         os.dup2(si.fileno(), sys.stdin.fileno())
         os.dup2(so.fileno(), sys.stdout.fileno())
         os.dup2(se.fileno(), sys.stderr.fileno())
-        #create pidfile
+        # create pidfile
         atexit.register(self.delpid)
         atexit.register(self.shutdownlogger)
         pid = str(os.getpid())
@@ -125,7 +126,7 @@ class DaemonBase(object):
         if not pid:
             sys.stderr.write("Stop failed. Daemon not running?\n")
             return
-        #kill daemon process
+        # kill daemon process
         print "Stopping daemon..."
         try:
             while 1:
@@ -166,7 +167,10 @@ class DaemonBase(object):
         pass
 
 
-class PagerDaemon(DaemonBase):  # inherits from DaemonBase to build a Unix daemon
+class PagerDaemon(DaemonBase):
+    """
+    PagerDaemon class inherits from DaemonBase to build a Unix daemon
+    """
 
     def __init__(self):
         '''
@@ -205,7 +209,8 @@ class PagerDaemon(DaemonBase):  # inherits from DaemonBase to build a Unix daemo
         '''
         Sets up the pager and go into infinity serving loop.
         '''
-        logging.info('OpenFirePager daemon running with PID: %s' % str(self.pid))
+        logging.info("OpenFirePager daemon running with PID: %s"
+                     % str(self.pid))
         p = Pager(params)
         p.run()
 
@@ -218,13 +223,15 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--verbose", dest="verbose",
                         action="store_true",
-                        help="Runs the daemon directly in the shell. Logs are printed to screen. Loglevel is always: DEBUG.")
+                        help="Runs the daemon directly in the shell. Logs are \
+                        printed to screen. Loglevel is always: DEBUG.")
     parser.add_argument("-d", "--dummy", dest="dummy",
                         action="store_true",
                         help="Triggers dummy mode. In this mode a dummy script (producing random output) \
                         instead of the multimon ZVEI decoder tool is used.")
     parser.add_argument("-l", "--loglevel", dest="loglevel",
-                        choices=['debug', 'info'], help="Defines the used logging level.")
+                        choices=['debug', 'info'], help="Defines the used \
+                        logging level.")
     parser.add_argument("-a", "--action", dest="action",
                         choices=['start', 'stop', 'restart', 'status'],
                         help="Action which should be performed on daemon.")
