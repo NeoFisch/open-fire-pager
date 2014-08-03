@@ -23,6 +23,7 @@ import subprocess
 import time
 import os
 import plugins
+import config
 
 
 class MonitordDriver(object):
@@ -41,20 +42,23 @@ class MonitoringThread(threading.Thread):
 
     def __init__(self):
         threading.Thread.__init__(self)
-        self.command = ["/home/manuel/monitor/trunk/monitord/monitord"]
-        self.cwd = "/home/manuel/monitor/trunk/monitord/"
-        self.alarm_script_dir = "/home/manuel/open-fire-pager/src/fire_daemon/plugins/alarm/"
-        self.zvei_filter = "51"
+        # load configuration values
+        self.command = config.DATA["monitord"]["directory"]
+        self.command += config.DATA["monitord"]["executable"]
+        self.cwd = config.DATA["monitord"]["directory"]
+        self.alarm_script_dir = config.DATA["plugins"]["alarm_script_dir"]
+        # first part of ZVEI codes
+        self.zvei_filter = config.DATA["options"]["zvei_filter"]
+        # time between two alarm runs of one ZVEI code
+        self.cooldown = config.DATA["options"]["alarm_cooldown"]
         # dict to store the last alarm of a ZVEI code:
         self.last_alarms = {}
-        # time between two alarm runs of one ZVEI code
-        self.cooldown = 60
 
     def run(self):
         # run monitord as a subprocess and parse outputs
         try:
             process = subprocess.Popen(
-                self.command,
+                [self.command],
                 cwd=self.cwd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT
@@ -71,12 +75,12 @@ class MonitoringThread(threading.Thread):
                 # logging.debug("Monitord output: %s" % str(data))
                 zvei = self.parse_zvei_code(data)
                 if zvei is not None:
-                    logging.info("Received ZVEI Code: %s" % zvei)
                     if zvei in self.last_alarms:
                         if abs(time.time()
                                 - self.last_alarms[zvei]) < self.cooldown:
                             continue  # skip execution (cooldown)
                     self.last_alarms[zvei] = time.time()
+                    logging.info("Received ZVEI Code: %s" % zvei)
                     plugins.execute_plugins(self.alarm_script_dir, arg=zvei)
             except:
                 logging.exception("Error in ZVEI decoding loop.")

@@ -21,14 +21,18 @@ import logging
 import time
 import monitord
 import plugins
+import config
 
 
 class Pager(object):
 
     def __init__(self, params):
         self.params = params
-        self.wakeupinterval = 600
-        self.wakeup_script_dir = "/home/manuel/open-fire-pager/src/fire_daemon/plugins/wakeup/"
+        # load configuration
+        config.load_config(params.config, basepath=params.path)
+        # get configuration values
+        self.wakeupinterval = config.DATA["options"]["wakeupinterval"]
+        self.wakeup_script_dir = config.DATA["plugins"]["wakeup_script_dir"]
 
     def run(self):
         self.setup()

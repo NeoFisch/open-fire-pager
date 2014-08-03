@@ -237,6 +237,8 @@ def parse_arguments():
     parser.add_argument("-a", "--action", dest="action",
                         choices=['start', 'stop', 'restart', 'status'],
                         help="Action which should be performed on daemon.")
+    parser.add_argument("-c", "--config", dest="config", default="config.json",
+                        help="Path to config file. Default: config.json")
     params = parser.parse_args()
     return params
 
@@ -244,6 +246,7 @@ def parse_arguments():
 if __name__ == '__main__':
     # parse command line parameters
     params = parse_arguments()
+    params.path = os.path.dirname(os.path.abspath(__file__)) + "/"
     # create daemon instance
     s = PagerDaemon()
     # process command

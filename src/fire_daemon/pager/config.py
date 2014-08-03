@@ -18,4 +18,21 @@
 """
 
 import json
+import logging
 
+
+DATA = {}
+
+
+def load_config(filename, basepath=""):
+    global DATA
+    try:
+        json_file = open(basepath + filename)
+        DATA = json.load(json_file)
+        json_file.close()
+        logging.info("Using configuration file: %s%s" % (basepath, filename))
+    except:
+        logging.exception(
+            "Can not load config file: %s%s" % (basepath, filename))
+        logging.warning("Could not load config. Stopping daemon.")
+        exit(1)
