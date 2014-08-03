@@ -1,0 +1,16 @@
+{
+	"monitord": {
+		"executable": "monitord",
+		"directory": "/home/manuel/monitor/trunk/monitord/"
+	},
+	"plugins": {
+		"alarm_script_dir": "/home/manuel/open-fire-pager/src/fire_daemon/plugins/alarm/",
+		"wakeup_script_dir": "/home/manuel/open-fire-pager/src/fire_daemon/plugins/wakeup/"
+	},
+	"options": {
+		"wakeupinterval": 600,
+		"alarm_cooldown": 60,
+		"zvei_filter": "51"
+	}
+
+}

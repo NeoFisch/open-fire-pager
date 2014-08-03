@@ -77,7 +77,7 @@ class MonitoringThread(threading.Thread):
                                 - self.last_alarms[zvei]) < self.cooldown:
                             continue  # skip execution (cooldown)
                     self.last_alarms[zvei] = time.time()
-                    self.execute_alarm_scripts(zvei)
+                    plugins.execute_plugins(self.alarm_script_dir, arg=zvei)
             except:
                 logging.exception("Error in ZVEI decoding loop.")
 
@@ -96,6 +96,3 @@ class MonitoringThread(threading.Thread):
         except:
             return logging.warning("Parsing exception.")
         return None
-
-    def execute_alarm_scripts(self, zvei):
-        plugins.execute_plugins(self.alarm_script_dir, arg=zvei)
