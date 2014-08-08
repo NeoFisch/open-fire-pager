@@ -32,7 +32,12 @@ class Pager(object):
         config.load_config(params.config, basepath=params.path)
         # get configuration values
         self.wakeupinterval = config.DATA["options"]["wakeupinterval"]
-        self.wakeup_script_dir = config.DATA["plugins"]["wakeup_script_dir"]
+        if config.DATA["plugins"]["wakeup_script_dir"].startswith("/"):
+            self.wakeup_script_dir = \
+                config.DATA["plugins"]["wakeup_script_dir"]
+        else:
+            self.wakeup_script_dir = params.path \
+                + config.DATA["plugins"]["wakeup_script_dir"]
 
     def run(self):
         self.setup()

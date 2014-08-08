@@ -1,11 +1,11 @@
 {
 	"monitord": {
 		"executable": "monitord",
-		"directory": "/home/manuel/monitor/trunk/monitord/"
+		"directory": "monitord_bin/x86/"
 	},
 	"plugins": {
-		"alarm_script_dir": "/home/manuel/open-fire-pager/src/fire_daemon/plugins/alarm/",
-		"wakeup_script_dir": "/home/manuel/open-fire-pager/src/fire_daemon/plugins/wakeup/"
+		"alarm_script_dir": "plugins/alarm/",
+		"wakeup_script_dir": "plugins/wakeup/"
 	},
 	"options": {
 		"wakeupinterval": 600,

@@ -30,7 +30,7 @@ class MonitordDriver(object):
 
     def __init__(self, params):
         self.params = params
-        self.monitor_thread = MonitoringThread()
+        self.monitor_thread = MonitoringThread(params)
         self.monitor_thread.setDaemon(True)
         logging.info("Monitord driver initialized.")
 
@@ -40,13 +40,27 @@ class MonitordDriver(object):
 
 class MonitoringThread(threading.Thread):
 
-    def __init__(self):
+    def __init__(self, params):
         threading.Thread.__init__(self)
+        self.params = params
         # load configuration values
-        self.command = config.DATA["monitord"]["directory"]
+
+        # configure monitord binary
+        if config.DATA["monitord"]["directory"].startswith("/"):
+            # configuration is abs. path
+            self.command = config.DATA["monitord"]["directory"]
+            self.cwd = config.DATA["monitord"]["directory"]
+        else:
+            # is relative path
+            self.command = params.path + config.DATA["monitord"]["directory"]
+            self.cwd = params.path + config.DATA["monitord"]["directory"]
         self.command += config.DATA["monitord"]["executable"]
-        self.cwd = config.DATA["monitord"]["directory"]
-        self.alarm_script_dir = config.DATA["plugins"]["alarm_script_dir"]
+        # configure alarm script folder
+        if config.DATA["plugins"]["alarm_script_dir"].startswith("/"):
+            self.alarm_script_dir = config.DATA["plugins"]["alarm_script_dir"]
+        else:
+            self.alarm_script_dir = params.path \
+                + config.DATA["plugins"]["alarm_script_dir"]
         # first part of ZVEI codes
         self.zvei_filter = config.DATA["options"]["zvei_filter"]
         # time between two alarm runs of one ZVEI code
@@ -57,6 +71,7 @@ class MonitoringThread(threading.Thread):
     def run(self):
         # run monitord as a subprocess and parse outputs
         try:
+            logging.debug("Trying to start monitord: %s" % self.command)
             process = subprocess.Popen(
                 [self.command],
                 cwd=self.cwd,

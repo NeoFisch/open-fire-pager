@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<monitordconfig version="1.0">
+<name> Monitord </name>
+<logfile> screen </logfile> <!-- screen = Bildschirm -->
+<loglevel> DEBUG </loglevel>
+<!--<SocketFilterScript> socketfilter.lua </SocketFilterScript> -->
+<!--<PluginFilterScript> pluginfilter.lua </PluginFilterScript> -->
+<auth>
+	<login>
+		<name>root</name>
+		<password>root</password>
+	</login>
+	<ip action="allow">127.0.0.1</ip> <!-- Diese IPs muessen sich nicht einloggen -->
+	<ip action="login"> any </ip> <!-- Diese IPs muessen sich einloggen -->
+	<ip action="deny">any</ip> <!-- Diese IPs koennen sich nicht einloggen -->
+</auth>
+
+<!--  -->
+<tcpsocket>
+	<bind> * </bind>
+	<port mode="monitord"> 9333 </port>
+</tcpsocket>
+
+<soundcard num="0">
+  <!--<device>/dev/dsp0</device>  <!-- OSS: die erste Soundkarte  -->
+  <device>plug:dsnoop</device>  <!-- ALSA: die erste Soundkarte  -->
+  <status>1</status> <!-- 1=aktiv, 0=deaktivert -->
+  <baud>44800</baud>
+  <name>SC1</name>
+  <!-- Linker Kanal -->
+  <channel part="left">
+	<name>CH1</name>
+	<module type="zvei">
+	</module>
+  </channel>
+  
+  <!-- Rechter Kanal -->
+  <channel part="right">
+	<name>CH2</name>
+	<module type="zvei">
+	</module>
+  </channel>
+</soundcard>
+
+
+<dataplugins>
+</dataplugins>
+
+</monitordconfig>
