@@ -40,7 +40,8 @@ def execute_plugins(script_dir, arg=None):
             if f.startswith("deactivated_") or f.startswith("off_"):
                 continue
             subprocess.Popen([os.path.join(script_dir, f),
-                             str(arg) if arg is not None else ""])
+                             str(arg) if arg is not None else ""],
+                             cwd=script_dir)
             logging.info("Executing: %s %s"
                          % (os.path.join(script_dir, f),
                             str(arg) if arg is not None else ""))
