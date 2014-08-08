@@ -27,14 +27,22 @@ def execute_plugins(script_dir, arg=None):
     Execute all scripts within the given folder.
     Add arg as first command line argument.
     """
-    script_list = [os.path.join(script_dir, f) for f
+    script_list = [str(f) for f
                    in os.listdir(script_dir) if
                    os.path.isfile(os.path.join(script_dir, f))]
     script_list.sort()
     for f in script_list:
         try:
-            subprocess.Popen([f, str(arg) if arg is not None else ""])
+            # only execute python end shell scripts
+            if not f.endswith(".py") and not f.endswith(".sh"):
+                continue
+            # allow deactivating scripts by name
+            if f.startswith("deactivated_") or f.startswith("off_"):
+                continue
+            subprocess.Popen([os.path.join(script_dir, f),
+                             str(arg) if arg is not None else ""])
             logging.info("Executing: %s %s"
-                         % (f, str(arg) if arg is not None else ""))
+                         % (os.path.join(script_dir, f),
+                            str(arg) if arg is not None else ""))
         except:
             logging.exception("Script execution error: %s" % str(f))
