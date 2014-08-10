@@ -23,7 +23,7 @@
 
 <soundcard num="0">
   <!--<device>/dev/dsp0</device>  <!-- OSS: die erste Soundkarte  -->
-  <device>plug:dsnoop</device>  <!-- ALSA: die erste Soundkarte  -->
+  <device>plug:dsnooper</device>  <!-- ALSA: die erste Soundkarte  -->
   <status>1</status> <!-- 1=aktiv, 0=deaktivert -->
   <baud>44800</baud>
   <name>SC1</name>
@@ -35,11 +35,11 @@
   </channel>
   
   <!-- Rechter Kanal -->
-  <channel part="right">
+  <!--<channel part="right">
 	<name>CH2</name>
 	<module type="zvei">
 	</module>
-  </channel>
+  </channel>-->
 </soundcard>
 
 
