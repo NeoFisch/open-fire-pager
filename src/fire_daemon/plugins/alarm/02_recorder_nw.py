@@ -12,13 +12,13 @@ ZVEI_CODES = ["51372"]
 def main(zvei):
     print "02_recorder_nw.py"
     # configurations
-    RECORD_DURATION = 30  # record duration in seconds
+    RECORD_DURATION = 45  # record duration in seconds
     RECORD_FILE = "/tmp/current_alarm_%s" % zvei  # record file (tmp)
     SERVER_DIR = "/var/www/a/"
-    ARCHIVE_DIR = "/tmp/archive/"
+    ARCHIVE_DIR = "/home/pi/alarmarchive/"
 
     # commands
-    CMD_RECORD = "arecord -D dsnoop -f S32_LE -c2 -r48000 \
+    CMD_RECORD = "arecord -D dsnooper -f S16_LE -c1 -r48000 \
     -t wav -N -d %d %s.wav" % (RECORD_DURATION, RECORD_FILE)
 
     CMD_ENCODE = "lame -b 64 -B 64 %s.wav" % RECORD_FILE
@@ -48,6 +48,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         if sys.argv[1] in ZVEI_CODES:
             main(sys.argv[1])
-            exit(0)
-    print "No ZVEI in argument."
-    exit(1)
+    else:
+        print "Missing argument: ZVEI code. Exitting."
+    exit(0)
+

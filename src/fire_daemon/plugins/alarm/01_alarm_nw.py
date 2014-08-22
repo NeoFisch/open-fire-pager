@@ -27,3 +27,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         if sys.argv[1] in ZVEI_CODES:
             main()
+    else:
+    	print "Missing argument: ZVEI code. Exitting."
+    exit(0)

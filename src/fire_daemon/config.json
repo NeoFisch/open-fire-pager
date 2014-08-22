@@ -1,7 +1,7 @@
 {
 	"monitord": {
 		"executable": "monitord",
-		"directory": "monitord_bin/x86/"
+		"directory": "monitord_bin/rpi/"
 	},
 	"plugins": {
 		"alarm_script_dir": "plugins/alarm/",
