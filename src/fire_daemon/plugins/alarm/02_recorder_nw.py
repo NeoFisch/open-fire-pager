@@ -21,7 +21,7 @@ def main(zvei):
     f = open('/tmp/record.lock', 'w')
     f.close()
     # wait
-    time.sleep(5)
+    time.sleep(3)
     # configurations
     RECORD_DURATION = 45  # record duration in seconds
     RECORD_FILE = "/tmp/current_alarm_%s" % "51372"  # record file (tmp)
@@ -59,7 +59,7 @@ def main(zvei):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        if sys.argv[1] in ZVEI_CODES or True:
+        if sys.argv[1] in ZVEI_CODES:
             main(sys.argv[1])
     else:
         print "Missing argument: ZVEI code. Exitting."
