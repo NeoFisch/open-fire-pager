@@ -47,7 +47,7 @@ def main(zvei):
     print "Encoding..."
     subprocess.call(CMD_ENCODE, shell=True)
     print "Uploading..."
-    #subprocess.call(CMD_UPLOAD, shell=True)
+    subprocess.call(CMD_UPLOAD, shell=True)
     print "Archiving..."
     subprocess.call(CMD_ARCHIVE, shell=True)
     print "Cleanup..."
