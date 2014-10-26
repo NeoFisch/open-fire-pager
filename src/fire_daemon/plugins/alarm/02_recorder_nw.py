@@ -5,15 +5,26 @@ Alarm script to record alarm messages and load them to a server.
 import sys
 import subprocess
 import time
+import os
 
-ZVEI_CODES = ["51372"]
+ZVEI_CODES = ["51366", "51367", "51368", "51369", "51370", "51371", "51372", "51373",
+              "51374", "51375", "51376", "51377", "51378", "51379", "51380", "51399"]
 
 
 def main(zvei):
     print "02_recorder_nw.py"
+    # check lock
+    if os.path.exists('/tmp/record.lock'):
+        print "Lock is set. Abort."
+        exit(0)
+    # create lock
+    f = open('/tmp/record.lock', 'w')
+    f.close()
+    # wait
+    time.sleep(5)
     # configurations
     RECORD_DURATION = 45  # record duration in seconds
-    RECORD_FILE = "/tmp/current_alarm_%s" % zvei  # record file (tmp)
+    RECORD_FILE = "/tmp/current_alarm_%s" % "51372"  # record file (tmp)
     SERVER_DIR = "/var/www/a/"
     ARCHIVE_DIR = "/home/pi/alarmarchive/"
 
@@ -36,17 +47,19 @@ def main(zvei):
     print "Encoding..."
     subprocess.call(CMD_ENCODE, shell=True)
     print "Uploading..."
-    subprocess.call(CMD_UPLOAD, shell=True)
+    #subprocess.call(CMD_UPLOAD, shell=True)
     print "Archiving..."
     subprocess.call(CMD_ARCHIVE, shell=True)
     print "Cleanup..."
     subprocess.call(CMD_CLEAN, shell=True)
     print "Finished."
 
+    # release lock
+    os.remove('/tmp/record.lock')
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        if sys.argv[1] in ZVEI_CODES:
+        if sys.argv[1] in ZVEI_CODES or True:
             main(sys.argv[1])
     else:
         print "Missing argument: ZVEI code. Exitting."
