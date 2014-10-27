@@ -21,7 +21,7 @@ def main(zvei):
     f = open('/tmp/record.lock', 'w')
     f.close()
     # wait
-    time.sleep(3)
+    time.sleep(2)
     # configurations
     RECORD_DURATION = 45  # record duration in seconds
     RECORD_FILE = "/tmp/current_alarm_%s" % "51372"  # record file (tmp)
