@@ -26,6 +26,7 @@ def main(zvei):
     RECORD_DURATION = 45  # record duration in seconds
     RECORD_FILE = "/tmp/current_alarm_%s" % "51372"  # record file (tmp)
     SERVER_DIR = "/var/www/a/"
+    SERVER_ARCHIVE = "/var/www/alarms/"
     ARCHIVE_DIR = "/home/pi/alarmarchive/"
 
     # commands
@@ -35,6 +36,8 @@ def main(zvei):
     CMD_ENCODE = "lame -b 64 -B 64 %s.wav" % RECORD_FILE
 
     CMD_UPLOAD = "scp %s.mp3 peu-srv-upload:%s" % (RECORD_FILE, SERVER_DIR)
+
+    CMD_UPLOAD2 = "scp %s.mp3 peu-srv-upload:%salarm_%s.mp3" % (RECORD_FILE, SERVER_ARCHIVE, str(time.time()))
 
     CMD_ARCHIVE = "cp %s.mp3 %salarm_%s.mp3" % \
         (RECORD_FILE, ARCHIVE_DIR, str(time.time()))
@@ -48,6 +51,9 @@ def main(zvei):
     subprocess.call(CMD_ENCODE, shell=True)
     print "Uploading..."
     subprocess.call(CMD_UPLOAD, shell=True)
+    time.sleep(120) # wait two minutes, for archive upload
+    print "Uploading... 2"
+    subprocess.call(CMD_UPLOAD2, shell=True)
     print "Archiving..."
     subprocess.call(CMD_ARCHIVE, shell=True)
     print "Cleanup..."
