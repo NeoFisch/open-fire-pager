@@ -8,7 +8,7 @@ import time
 import os
 
 ZVEI_CODES = ["51366", "51367", "51368", "51369", "51370", "51371", "51372", "51373",
-              "51374", "51375", "51376", "51377", "51378", "51379", "51380", "51399"]
+              "51374", "51375", "51376", "51377", "51378", "51379", "51399"]
 
 
 def main(zvei):
@@ -20,6 +20,7 @@ def main(zvei):
     # create lock
     f = open('/tmp/record.lock', 'w')
     f.close()
+    print "Created lock."
     # wait
     time.sleep(2)
     # configurations
@@ -51,6 +52,7 @@ def main(zvei):
     subprocess.call(CMD_ENCODE, shell=True)
     print "Uploading..."
     subprocess.call(CMD_UPLOAD, shell=True)
+    print "Wait for 120s"
     time.sleep(120) # wait two minutes, for archive upload
     print "Uploading... 2"
     subprocess.call(CMD_UPLOAD2, shell=True)
@@ -62,6 +64,7 @@ def main(zvei):
 
     # release lock
     os.remove('/tmp/record.lock')
+    print "Lock released."
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
