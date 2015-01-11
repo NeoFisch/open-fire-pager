@@ -15,16 +15,15 @@ def main(zvei):
     print "10_pushover.py"
     # load secret data
     f = open("pushover_app_token.txt", "r")
-    APP_API_KEY = f.read()
-    APP_API_KEY.strip()
+    APP_API_KEY = f.read().strip()
+    print APP_API_KEY
     f.close()
     f = open("pushover_user_token.txt", "r")
-    USER_API_KEY = f.read()
-    USER_API_KEY.strip()
+    USER_API_KEY = f.read().strip()
+    print USER_API_KEY
     f.close()
     f = open("alarm_url.txt", "r")
-    ALARM_URL = f.read()
-    ALARM_URL.strip()
+    ALARM_URL = f.read().strip()
     f.close()
 
     # build push notification
@@ -48,7 +47,7 @@ def main(zvei):
                                   }),
                  {"Content-type": "application/x-www-form-urlencoded"})
     resp = conn.getresponse()
-    print "Pushover request delivered: %s" % str(resp)
+    print "Pushover request delivered: %s" % str(resp.status)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
